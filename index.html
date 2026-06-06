@@ -698,9 +698,12 @@ function animate() {
 animate();
 
 // ── Config ──
-const API_BASE = window.location.hostname === 'sovereign.empirelabs.com.au' || window.location.hostname === 'empirelab1.github.io'
-  ? 'https://api.empirelabs.com.au'
-  : '';
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+  ? '' 
+  : 'https://sovereign.empirelabs.com.au';
+
+// Determine if we can reach the API
+let apiReachable = !!API_BASE;
 
 const chatMessages = document.getElementById('chat-messages');
 const chatInput = document.getElementById('chat-input');
@@ -800,8 +803,9 @@ async function pollStatus() {
     document.getElementById('stat-version').textContent = data.version || '—';
     document.getElementById('stat-since').textContent = data.since ? new Date(data.since).toLocaleDateString() : '—';
   } catch(e) {
-    statusText.textContent = 'Offline (local-only mode)';
-    heroStatus.innerHTML = '<span class="status-dot" style="background:#555;"></span><span>Local mode — API server offline</span>';
+    apiReachable = false;
+    statusText.textContent = 'Offline — local-only mode';
+    heroStatus.innerHTML = '<span class="status-dot" style="background:#555;"></span><span>Local mode — API server not reachable</span>';
     document.getElementById('stat-status').textContent = 'Offline';
   }
   setTimeout(pollStatus, 15000);
